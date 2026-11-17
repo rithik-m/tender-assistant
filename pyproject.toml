@@ -1,0 +1,28 @@
+[project]
+name = "tender-assistant"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "databricks-langchain>=0.22.0",
+    "databricks-mcp>=0.9.2",
+    "databricks-sdk>=0.166.0",
+    "dotenv>=0.9.9",
+    "langchain>=1.5.0",
+    "langgraph>=1.2.22",
+    "mcp>=1.24,<2",
+    "streamlit>=1.67.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tender_assistant"]
+
+[tool.uv.workspace]
+members = [
+    "git",
+]
