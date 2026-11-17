@@ -40,6 +40,13 @@ def _as_text(content: Any) -> str:
     return "" if content is None else str(content)
 
 
+def _leaf_errors(exc: BaseException) -> list[BaseException]:
+    """Unwrap (nested) ExceptionGroups, e.g. from MCP TaskGroups, to the real errors."""
+    if isinstance(exc, BaseExceptionGroup):
+        return [leaf for e in exc.exceptions for leaf in _leaf_errors(e)]
+    return [exc]
+
+
 class AgentService:
     def __init__(self, settings: Settings | None = None):
         self.settings = settings or get_settings()
@@ -120,7 +127,7 @@ class AgentService:
                 tool_calls=tool_calls,
             )
         except Exception as exc:  # surface to the UI instead of crashing the stream
-            yield RunFailed(f"{type(exc).__name__}: {exc}")
+            yield RunFailed("; ".join(f"{type(e).__name__}: {e}" for e in _leaf_errors(exc)))
 
     async def areset(self, thread_id: str) -> None:
         await self.checkpointer.adelete_thread(thread_id)
